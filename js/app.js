@@ -8,33 +8,35 @@ $(document).ready(function() {
 
     $('.cell').click(function() {
 
-        //when a tile is clicked, add an x to the tile. But only if it's blank
+        //check if a cell is blank
         var myId = this.id;
-        if ($('#'+ myId).text() === ''){
-            $('#'+ myId).text(userLetter);
+        if ($('#'+ myId).text() !== ''){
+            return;
         }
+        //writes the user letter to a cell
+        $('#'+ myId).text(userLetter);
 
-        //write user choice to board
+        //write user choice to internal board
         board[myId] = userLetter;
-        console.log(board);
 
         //check for draw
         if (check_for_draw(board)){
             alert("You Draw!");
             boardReset();
             promptUserForLetter();
+            return;
+        }
+
+        //check if computer won
+        if (checkForWin(board, computerLetter)){
+            alert("You Lose!");
+            boardReset();
+            promptUserForLetter();
+            return;
         }
 
         //computers turn
         moveComputer(computerMoveChoice(board));
-        console.log(board);
-
-        //check for draw
-        if (check_for_draw(board)){
-            alert("You Draw!");
-            boardReset();
-            promptUserForLetter();
-        }
 
         //check if computer won
         if (checkForWin(board, computerLetter)){
@@ -45,7 +47,7 @@ $(document).ready(function() {
 
     });
 
-
+    //checks if the computer won yet (user can't win)
     function checkForWin(board_now, letter){
         if ((board_now[6] == letter && board_now[7] == letter && board_now[8] == letter) ||
         (board_now[3] == letter && board_now[4] == letter && board_now[5] == letter) ||
@@ -60,7 +62,7 @@ $(document).ready(function() {
             return false;
         }
     }
-
+    //checks for a draw
     function check_for_draw(current_board) {
         var boardFull = true;
         var blankBoard = [0,1,2,3,4,5,6,7,8];
@@ -72,14 +74,14 @@ $(document).ready(function() {
         }
         return boardFull;
     }
-
+    //reset the board back to it's original format
     function boardReset() {
         board = [0,1,2,3,4,5,6,7,8];
         userLetter = 'X';
         computerLetter = 'O';
         $('.cell').text('');
     }
-
+    //asks the user what letter they want to be
     function promptUserForLetter() {
         $( "#dialog-confirm" ).dialog({
             resizable: false,
@@ -97,7 +99,7 @@ $(document).ready(function() {
             }
         });
     }
-
+    //copies the current board
     function copyBoard(copyBoard) {
         var outCopyBoard = [];
 
@@ -107,11 +109,11 @@ $(document).ready(function() {
 
         return outCopyBoard;
     }
-
+    //checks if a space is empty
     function checkIfEmpty(emptyBoard, compInput){
         return (emptyBoard[compInput] !== 'X' && emptyBoard[compInput] !== 'O')
     }
-
+    //returns where the computer is going to move
     function computerMoveChoice(computerBoard){
         //goes down the list of moves in optimal order
         if (win()){
@@ -182,7 +184,7 @@ $(document).ready(function() {
             }
         }
     }
-
+    //moves the computer
     function moveComputer(move){
         board[move] = computerLetter;
         $('#'+ move).text(computerLetter);
